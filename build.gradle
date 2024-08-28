@@ -29,13 +29,12 @@ targetCompatibility = '1.8'
 dependencies {
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
-    testImplementation('com.zaxxer:HikariCP:4.0.3')
-//    implementation('com.fasterxml.jackson.core:jackson-databind:2.17.2')
-    runtimeOnly 'mysql:mysql-connector-java:8.0.33'
-    runtimeOnly 'org.postgresql:postgresql:42.7.3'
-    implementation 'ch.qos.logback:logback-classic:1.2.11'
-    implementation 'ch.qos.logback:logback-core:1.2.11'
-    compileOnly 'org.slf4j:slf4j-api:2.0.12'
+//    testImplementation('com.zaxxer:HikariCP:4.0.3')
+//    runtimeOnly 'mysql:mysql-connector-java:8.0.33'
+//    runtimeOnly 'org.postgresql:postgresql:42.7.3'
+//    implementation 'ch.qos.logback:logback-classic:1.2.11'
+//    implementation 'ch.qos.logback:logback-core:1.2.11'
+//    compileOnly 'org.slf4j:slf4j-api:2.0.12'
 }
 
 test {
