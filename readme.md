@@ -166,7 +166,7 @@ public class StudentModel {
 
 项目的整体设计架构很简洁清晰，每个sql操作都是通过[SqlExecutor](src%2Fmain%2Fjava%2Fcom%2Fcoderevolt%2Fsql%2FSqlExecutor.java)类创建对应的sql执行链路，在builder方法中可以设置[SqlOption](src%2Fmain%2Fjava%2Fcom%2Fcoderevolt%2Fsql%2Fconfig%2FSqlOption.java) 类来配置本次执行，或者使用默认的配置。在这个链路中会创建一个上下文容器[SqlChainContext](src%2Fmain%2Fjava%2Fcom%2Fcoderevolt%2Fsql%2Fcore%2FSqlChainContext.java)类存放所有的信息。
 子查询同样可以看作是没有执行动作（例如exec()、listMap()）的执行链，执行链的上下文信息会在嵌套子查询之间传递。
-![继承树](img.png)
+![继承树](img_5.png)
 
 每一个子操作都被抽象成[AbstractSub](src%2Fmain%2Fjava%2Fcom%2Fcoderevolt%2Fsql%2Fcore%2Fsub%2FAbstractSub.java)类的子类，并实现apply抽象方法。
 子操作可以分为三大类：compare（where、havaing、on）、order（order by）、set（update set）
@@ -197,4 +197,5 @@ gitee地址: <https://gitee.com/song_biao/easy-orm>
 联系方式: <646997146@qq.com>
 
 公众号: codeRevolt
+
 ![img_4.png](img_4.png)
