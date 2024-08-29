@@ -26,6 +26,13 @@ public class DeleteSqlTest {
                 .exec();
 
         System.out.println("执行结果: " + result);
+
+        boolean result2 = SqlExecutor.builder().deleteChain()
+                .deleteFrom(StudentModel.class)
+                .where(SubUtil.like(StudentModel::getName, "%张%"))
+                .exec();
+
+        System.out.println(result2);
     }
 
 }

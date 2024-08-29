@@ -2,10 +2,12 @@ package com.coderevolt.sql.core.dql;
 
 import com.coderevolt.doc.NotNull;
 import com.coderevolt.doc.Nullable;
+import com.coderevolt.sql.attr.Column;
 import com.coderevolt.sql.core.SqlChainContext;
 import com.coderevolt.sql.core.sub.AbstractSub;
 import com.coderevolt.sql.core.sub.SubOrder;
 import com.coderevolt.util.Assert;
+import com.coderevolt.util.FieldUtil;
 import com.coderevolt.util.SFunction;
 import com.coderevolt.util.SelectFunction;
 
@@ -157,7 +159,13 @@ public class SelectSqlGenerator extends DQLSqlGenerator {
                 V t = clazz.newInstance();
                 for (Field declaredField : clazz.getDeclaredFields()) {
                     declaredField.setAccessible(true);
-                    Object value = row.get(declaredField.getName());
+                    Column column = declaredField.getAnnotation(Column.class);
+                    Object value = null;
+                    if (column != null && !"@".equals(column.name())) {
+                        value = row.get(FieldUtil.camelCase(column.name()));
+                    } else {
+                        value = row.get(declaredField.getName());
+                    }
                     try {
                         declaredField.set(t, value);
                     } catch (RuntimeException e) {
@@ -194,8 +202,15 @@ public class SelectSqlGenerator extends DQLSqlGenerator {
             try {
                 V t = clazz.newInstance();
                 for (Field declaredField : clazz.getDeclaredFields()) {
+                    Object value = null;
+                    Column column = declaredField.getAnnotation(Column.class);
+                    if (column != null && !"@".equals(column.name())) {
+                        value = map.get(FieldUtil.camelCase(column.name()));
+                    } else {
+                        value = map.get(declaredField.getName());
+                    }
                     declaredField.setAccessible(true);
-                    declaredField.set(t, map.get(declaredField.getName()));
+                    declaredField.set(t, value);
                 }
                 return t;
             } catch (InstantiationException | IllegalAccessException e) {

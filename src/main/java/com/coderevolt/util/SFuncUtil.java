@@ -1,5 +1,6 @@
 package com.coderevolt.util;
 
+import com.coderevolt.sql.attr.Column;
 import com.coderevolt.sql.core.symbol.VariablePlaceholder;
 
 import java.beans.Introspector;
@@ -96,19 +97,29 @@ public class SFuncUtil {
     public static <T> String getColumn(SFunction<T, ?> fn) {
         try {
             SerializedLambda serializedLambda = getSerializedLambda(fn);
+            String methodName = serializedLambda.getImplMethodName();
+            // 对于非标准变量生成的Get方法这里可以直接抛出异常，或者打印异常日志
+            Matcher matcher = FIELD_PATTERN.matcher(methodName);
+            if (!matcher.matches()) {
+                throw new IllegalArgumentException("field " + methodName + " not found");
+            }
+            Field field = null;
+            methodName = matcher.group(2);
             String implClass = serializedLambda.getImplClass();
-            // 对于非标准变量生成的Get方法这里可以直接抛出异常，或者打印异常日志
-            int index = implClass.lastIndexOf("/");
-            if (index != -1) {
-                implClass = implClass.substring(index + 1);
+            Class<?> clz = Class.forName(implClass.replace("/", "."));
+            try {
+                field = clz.getDeclaredField(Introspector.decapitalize(methodName));
+            } catch (NoSuchFieldException e) {
+                field = clz.getDeclaredField(methodName);
             }
-            String field = serializedLambda.getImplMethodName();
-            // 对于非标准变量生成的Get方法这里可以直接抛出异常，或者打印异常日志
-            Matcher matcher = FIELD_PATTERN.matcher(field);
-            if (matcher.matches()) {
-                field = matcher.group(2);
+            Column columnAnno = field.getAnnotation(Column.class);
+            String fieldName = String.format(VariablePlaceholder.TABLE_NAME_DOT, Introspector.decapitalize(implClass.substring(implClass.lastIndexOf("/") + 1)));
+            if (columnAnno != null) {
+                fieldName += "@".equals(columnAnno.name()) ? FieldUtil.underline(field.getName()) : columnAnno.name();
+            } else {
+                fieldName += FieldUtil.underline(field.getName());
             }
-            return String.format(VariablePlaceholder.TABLE_NAME_DOT, Introspector.decapitalize(implClass)) + FieldUtil.underline(field);
+            return fieldName;
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);
         }

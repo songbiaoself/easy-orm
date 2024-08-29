@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class DMLSqlGenerator extends AbstractSqlGenerator {
 
@@ -41,19 +42,20 @@ public class DMLSqlGenerator extends AbstractSqlGenerator {
         Table tableAnnotation = tableEntity.getAnnotation(Table.class);
         Assert.isTrue(tableAnnotation != null && tableAnnotation.value() != null, tableEntity.getName() + "not use @Table annotation defined a table name");
         sqlBuf.append("INSERT INTO ").append(tableAnnotation.value());
+        Stream<Field> fieldStream = null;
         if (columns != null && columns.length > 0) {
-            sqlBuf.append("(").append(Arrays.stream(columns).map(col -> {
-                Field field = SFuncUtil.getField(col);
-                Column column = field.getAnnotation(Column.class);
-                sqlChainContext.addInsertColumn(field.getName());
-                if (column == null) {
-                    return FieldUtil.underline(field.getName());
-                }
-                return "@".equals(column.name()) ? FieldUtil.underline(field.getName()) : column.name();
-            }).collect(Collectors.joining(","))).append(")");
+            fieldStream = Arrays.stream(columns).map(SFuncUtil::getField);
         } else {
-            FieldUtil.listField(tableEntity).forEach(sqlChainContext::addInsertColumn);
+            fieldStream = Arrays.stream(tableEntity.getDeclaredFields());
         }
+        sqlBuf.append("(").append(fieldStream.map(field -> {
+            Column column = field.getAnnotation(Column.class);
+            sqlChainContext.addInsertColumn(field.getName());
+            if (column == null) {
+                return FieldUtil.underline(field.getName());
+            }
+            return "@".equals(column.name()) ? FieldUtil.underline(field.getName()) : column.name();
+        }).collect(Collectors.joining(","))).append(")");
         return this;
     }
 

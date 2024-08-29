@@ -1,11 +1,6 @@
 package com.coderevolt.util;
 
-import com.coderevolt.sql.attr.Column;
-
 import java.beans.Introspector;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class FieldUtil {
 
@@ -37,16 +32,6 @@ public class FieldUtil {
             }
         }
         return res.toString();
-    }
-
-    public static List<String> listField(Class<?> clz) {
-        return Arrays.stream(clz.getDeclaredFields()).map(f -> {
-            Column column = f.getAnnotation(Column.class);
-            if (column != null) {
-                return "@".equals(column.name()) ? f.getName() : column.name();
-            }
-            return f.getName();
-        }).collect(Collectors.toList());
     }
 
 }

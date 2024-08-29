@@ -156,7 +156,7 @@ public class SelectSqlTest {
     @Test
     public void sqlInjectTest() throws SQLException {
         System.out.println(SqlExecutor.builder().selectChain()
-                .select()
+                .select(StudentModel::getName, StudentModel::getAge)
                 .from(StudentModel.class)
                 .where(SubUtil.like(StudentModel::getName, "%李四% or 1 = 1"))
                 .listMap());

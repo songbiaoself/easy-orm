@@ -9,6 +9,7 @@ public class StudentModel {
     @Column(type = Column.ColumnType.ID)
     private Long id;
 
+    @Column(name = "t_name")
     private String name;
 
     @Column(dmlStrategy = Column.DmlStrategy.IGNORE_NULL)
@@ -28,7 +29,7 @@ public class StudentModel {
         this.name = name;
     }
 
-    public StudentModel( String name, Integer age) {
+    public StudentModel(String name, Integer age) {
         this.name = name;
         this.age = age;
     }

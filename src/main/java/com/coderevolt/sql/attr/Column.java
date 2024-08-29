@@ -11,16 +11,10 @@ import java.lang.annotation.Target;
 public @interface Column {
 
     /**
-     * 字段名称
+     * 字段名称， 增删改查时自动映射
      * @return
      */
     String name() default "@";
-
-    /**
-     * 字段顺序
-     * @return
-     */
-    int order() default 0;
 
     /**
      * 字段类型
