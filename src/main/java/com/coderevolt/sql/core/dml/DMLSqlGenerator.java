@@ -138,10 +138,13 @@ public class DMLSqlGenerator extends AbstractSqlGenerator {
                         .collect(Collectors.joining(", "));
                 log.debug("==> {}", paramInfo);
             }
-            result = preparedStatement.executeUpdate() > 0;
+
+            int count = preparedStatement.executeUpdate();
+            log.debug("<== affected row: {}", count);
+            result = true;
 
             if (sqlOption.getSqlExecuteHook() != null) {
-                sqlOption.getSqlExecuteHook().afterRun(connection, getSqlChainContext(), result);
+                sqlOption.getSqlExecuteHook().afterRun(connection, getSqlChainContext(), count);
             }
         } catch (Exception e) {
             log.error("execute error", e);

@@ -4,7 +4,10 @@ import com.coderevolt.sql.SubSelectBuilder;
 import com.coderevolt.sql.config.SqlOption;
 import com.coderevolt.sql.core.SqlChainContext;
 import com.coderevolt.sql.core.dql.SubSelectSqlGenerator;
-import com.coderevolt.sql.core.sub.*;
+import com.coderevolt.sql.core.sub.AbstractSub;
+import com.coderevolt.sql.core.sub.SubCompareChain;
+import com.coderevolt.sql.core.sub.SubOrder;
+import com.coderevolt.sql.core.sub.SubSet;
 import com.coderevolt.sql.core.symbol.SqlSort;
 
 import java.io.Serializable;
@@ -32,11 +35,11 @@ public class SubUtil {
         return new SubCompareChain().lq(column, parentColumn);
     }
 
-    public static <T, R> SubCompareChain rt(SFunction<T, ?> column, SFunction<R, ?> parentColumn) {
+    public static <T, R> SubCompareChain gt(SFunction<T, ?> column, SFunction<R, ?> parentColumn) {
         return new SubCompareChain().gt(column, parentColumn);
     }
 
-    public static <T, R> SubCompareChain rq(SFunction<T, ?> column, SFunction<R, ?> parentColumn) {
+    public static <T, R> SubCompareChain gq(SFunction<T, ?> column, SFunction<R, ?> parentColumn) {
         return new SubCompareChain().gq(column, parentColumn);
     }
 
@@ -56,11 +59,11 @@ public class SubUtil {
         return new SubCompareChain().lq(column, subSelect);
     }
 
-    public static <T> SubCompareChain rt(SFunction<T, ?> column, SelectFunction<SqlChainContext, SubSelectSqlGenerator> subSelect) {
+    public static <T> SubCompareChain gt(SFunction<T, ?> column, SelectFunction<SqlChainContext, SubSelectSqlGenerator> subSelect) {
         return new SubCompareChain().gt(column, subSelect);
     }
 
-    public static <T> SubCompareChain rq(SFunction<T, ?> column, SelectFunction<SqlChainContext, SubSelectSqlGenerator> subSelect) {
+    public static <T> SubCompareChain gq(SFunction<T, ?> column, SelectFunction<SqlChainContext, SubSelectSqlGenerator> subSelect) {
         return new SubCompareChain().gq(column, subSelect);
     }
 
@@ -88,11 +91,11 @@ public class SubUtil {
         return new SubCompareChain().lq(column, data);
     }
 
-    public static <T> SubCompareChain rt(SFunction<T, ?> column, Serializable data) {
+    public static <T> SubCompareChain gt(SFunction<T, ?> column, Serializable data) {
         return new SubCompareChain().gt(column, data);
     }
 
-    public static <T> SubCompareChain rq(SFunction<T, ?> column, Serializable data) {
+    public static <T> SubCompareChain gq(SFunction<T, ?> column, Serializable data) {
         return new SubCompareChain().gq(column, data);
     }
 
@@ -104,12 +107,12 @@ public class SubUtil {
         return new SubCompareChain().notIn(column, data);
     }
 
-    public static <T> SubCompareChain exist(SFunction<T, ?> column, SelectFunction<SqlChainContext, SubSelectSqlGenerator> subSelect) {
-        return new SubCompareChain().exist(column, subSelect);
+    public static <T> SubCompareChain exist(SelectFunction<SqlChainContext, SubSelectSqlGenerator> subSelect) {
+        return new SubCompareChain().exist(subSelect);
     }
 
-    public static <T> SubCompareChain notExist(SFunction<T, ?> column, SelectFunction<SqlChainContext, SubSelectSqlGenerator> subSelect) {
-        return new SubCompareChain().notExist(column, subSelect);
+    public static <T> SubCompareChain notExist(SelectFunction<SqlChainContext, SubSelectSqlGenerator> subSelect) {
+        return new SubCompareChain().notExist(subSelect);
     }
 
     public static <T> SubCompareChain isNull(SFunction<T, ?> column) {
@@ -152,8 +155,12 @@ public class SubUtil {
         return SubSelectBuilder.create(option);
     }
 
-    public static SubWrapper wrap(AbstractSub subs) {
-        return SubWrapper.wrapper(subs);
+    public static SubCompareChain wrap(AbstractSub subs) {
+        return new SubCompareChain().wrap(subs);
+    }
+
+    public static SubCompareChain sql(String sql) {
+        return new SubCompareChain().sql(sql);
     }
 
 }

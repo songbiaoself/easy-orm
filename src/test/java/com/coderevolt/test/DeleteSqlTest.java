@@ -22,7 +22,7 @@ public class DeleteSqlTest {
     public void simpleTest() {
         boolean result = SqlExecutor.builder().deleteChain()
                 .deleteFrom(StudentModel.class)
-                .where(SubUtil.lt(StudentModel::getAge, 10))
+                .where(SubUtil.isNull(StudentModel::getAge))
                 .exec();
 
         System.out.println("执行结果: " + result);

@@ -11,7 +11,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class SubCompare<T, R> extends AbstractSubComparator {
+public class SubCompare<T, R> extends AbstractSub {
 
     private final SFunction<T, ?> column;
 

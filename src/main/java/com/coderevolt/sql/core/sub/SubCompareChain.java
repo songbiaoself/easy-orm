@@ -19,19 +19,36 @@ import java.util.stream.Collectors;
 
 public class SubCompareChain extends AbstractSubChain {
 
-    private final List<AbstractSubComparator> compareList;
+    private final List<AbstractSub> compareList;
 
     public SubCompareChain() {
         this.compareList = new ArrayList<>();
     }
 
     public <T, R>SubCompareChain between(SFunction<T, ?> column, Serializable start, Serializable end) {
-        compareList.add(new AbstractSubComparator() {
+        compareList.add(new AbstractSub() {
             @Override
             public String apply(SqlChainContext ctx) {
                 ctx.addParamValue(start);
                 ctx.addParamValue(end);
                 sqlBuf.append(SFuncUtil.getColumn(column)).append(" ").append(SqlOp.M.BETWEEN).append(" ? AND ?");
+                if (link != null) {
+                    this.sqlBuf.append(" ").append(link);
+                }
+                return toSql();
+            }
+        });
+        return this;
+    }
+
+    public SubCompareChain wrap(AbstractSub abstractSub) {
+        compareList.add(new AbstractSub() {
+            @Override
+            public String apply(SqlChainContext ctx) {
+                sqlBuf.append("(").append(abstractSub.apply(ctx)).append(")");
+                if (link != null) {
+                    this.sqlBuf.append(" ").append(link);
+                }
                 return toSql();
             }
         });
@@ -126,11 +143,11 @@ public class SubCompareChain extends AbstractSubChain {
         return compare(column, SqlOp.M.NOT_IN, data);
     }
 
-    public <T, R>SubCompareChain exist(SFunction<T, ?> column, SelectFunction<SqlChainContext, SubSelectSqlGenerator> subSelect) {
+    public <T, R>SubCompareChain exist(SelectFunction<SqlChainContext, SubSelectSqlGenerator> subSelect) {
         return compare(SqlOp.L.EXISTS, subSelect);
     }
 
-    public <T, R>SubCompareChain notExist(SFunction<T, ?> column, SelectFunction<SqlChainContext, SubSelectSqlGenerator> subSelect) {
+    public <T, R>SubCompareChain notExist(SelectFunction<SqlChainContext, SubSelectSqlGenerator> subSelect) {
         return compare(SqlOp.L.NOT_EXISTS, subSelect);
     }
 
@@ -212,7 +229,7 @@ public class SubCompareChain extends AbstractSubChain {
 
     @Override
     public SubCompareChain sql(String sql) {
-        compareList.add(new AbstractSubComparator() {
+        compareList.add(new AbstractSub() {
 
             @Override
             public String apply(SqlChainContext ctx) {

@@ -240,9 +240,9 @@ public abstract class DQLSqlGenerator extends AbstractSqlGenerator {
                 }
                 result.add(map);
             }
-            log.debug("<==  total:{}", result.size());
+            log.debug("<== total: {}", result.size());
             if (log.isTraceEnabled()) {
-                log.trace("<== data:{}", result);
+                log.trace("<== data: {}", result);
             }
 
             if (sqlOption.getSqlExecuteHook() != null) {

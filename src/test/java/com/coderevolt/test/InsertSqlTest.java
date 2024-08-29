@@ -2,7 +2,6 @@ package com.coderevolt.test;
 
 import com.coderevolt.connect.SqlConnectFactory;
 import com.coderevolt.model.StudentModel;
-import com.coderevolt.model.SubjectModel;
 import com.coderevolt.sql.SqlExecutor;
 import com.coderevolt.util.SubUtil;
 import com.zaxxer.hikari.HikariConfig;
@@ -10,6 +9,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;
+import java.util.Arrays;
 
 public class InsertSqlTest {
 
@@ -24,9 +24,8 @@ public class InsertSqlTest {
     @Test
     public void insertTest() throws SQLException {
         boolean result = SqlExecutor.builder().insertChain()
-//                .insertInto(StudentModel.class) 等于 insert into student
                 .insertInto(StudentModel.class, StudentModel::getName, StudentModel::getAge)
-                .values(new StudentModel("老王", 20))
+                .values(new StudentModel("张三", 20))
                 .exec();
 
         System.out.println("执行结果: " + result);
@@ -34,20 +33,27 @@ public class InsertSqlTest {
 
     @Test
     public void insertSelectTest() throws SQLException {
-
         System.out.println(SqlExecutor.builder().insertChain()
                 .insertInto(StudentModel.class, StudentModel::getName)
-                .select(SubUtil.subSelect()
-                        .select(StudentModel::getName)
-                        .from(StudentModel.class))
+                .select(SubUtil.subSelect().select(StudentModel::getName).from(StudentModel.class))
+                .exec());
+
+        System.out.println(SqlExecutor.builder().insertChain()
+                .insertInto(StudentModel.class)
+                .select(SubUtil.subSelect().select().from(StudentModel.class))
                 .exec());
     }
 
     @Test
-    public void blobTest() {
+    public void insertBatchTest() throws SQLException {
         System.out.println(SqlExecutor.builder().insertChain()
-                .insertInto(SubjectModel.class)
-                .values(new SubjectModel(null, "test", "hello".getBytes()))
+                .insertInto(StudentModel.class)
+                .values(Arrays.asList(new StudentModel("张三", 20), new StudentModel("李四", 25)))
+                .exec());
+
+        System.out.println(SqlExecutor.builder().insertChain()
+                .insertInto(StudentModel.class, StudentModel::getName, StudentModel::getAge)
+                .values(Arrays.asList(new StudentModel("张三", 20), new StudentModel("李四", 25)))
                 .exec());
     }
 

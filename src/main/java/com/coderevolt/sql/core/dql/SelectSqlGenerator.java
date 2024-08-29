@@ -57,10 +57,6 @@ public class SelectSqlGenerator extends DQLSqlGenerator {
         return (SelectSqlGenerator) super.leftJoin(tableEntity, alias, subOn);
     }
 
-    public SelectSqlGenerator leftJoin(@NotNull Class<?> tableEntity) {
-        return leftJoin(tableEntity, null, null);
-    }
-
     public SelectSqlGenerator leftJoin(@NotNull Class<?> tableEntity, AbstractSub subOn) {
         return leftJoin(tableEntity, null, subOn);
     }
@@ -77,10 +73,6 @@ public class SelectSqlGenerator extends DQLSqlGenerator {
     @Override
     public SelectSqlGenerator rightJoin(@NotNull Class<?> tableEntity, String alias, AbstractSub subOn) {
         return (SelectSqlGenerator) super.rightJoin(tableEntity, alias, subOn);
-    }
-
-    public SelectSqlGenerator rightJoin(@NotNull Class<?> tableEntity) {
-        return rightJoin(tableEntity, null, null);
     }
 
     public SelectSqlGenerator rightJoin(@NotNull Class<?> tableEntity, AbstractSub subOn) {
@@ -103,6 +95,10 @@ public class SelectSqlGenerator extends DQLSqlGenerator {
 
     public SelectSqlGenerator innerJoin(@NotNull Class<?> tableEntity) {
         return innerJoin(tableEntity, null, null);
+    }
+
+    public SelectSqlGenerator innerJoin(@NotNull Class<?> tableEntity, String alias) {
+        return innerJoin(tableEntity, alias, null);
     }
 
     public SelectSqlGenerator innerJoin(@NotNull Class<?> tableEntity, AbstractSub subOn) {
@@ -161,7 +157,26 @@ public class SelectSqlGenerator extends DQLSqlGenerator {
                 V t = clazz.newInstance();
                 for (Field declaredField : clazz.getDeclaredFields()) {
                     declaredField.setAccessible(true);
-                    declaredField.set(t, row.get(declaredField.getName()));
+                    Object value = row.get(declaredField.getName());
+                    try {
+                        declaredField.set(t, value);
+                    } catch (RuntimeException e) {
+                        if (value instanceof Number) {
+                            // 值强转
+                            Class<?> type = declaredField.getType();
+                            if (type == float.class || type == Float.class) {
+                                declaredField.set(t, ((Number) value).floatValue());
+                            } else if (type == int.class || type == Integer.class) {
+                                declaredField.set(t, ((Number) value).intValue());
+                            } else if (type == short.class || type == Short.class) {
+                                declaredField.set(t, ((Number) value).shortValue());
+                            } else if (type == byte.class || type == Byte.class) {
+                                declaredField.set(t, ((Number) value).byteValue());
+                            }
+                        } else {
+                            throw e;
+                        }
+                    }
                 }
                 result.add(t);
             } catch (InstantiationException | IllegalAccessException e) {

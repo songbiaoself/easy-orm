@@ -57,9 +57,9 @@ public abstract class AbstractSqlGenerator {
 
     protected void connectTable(@NotNull String prefix, @NotNull SelectFunction<SqlChainContext, SubSelectSqlGenerator> subSelectFunc, @NotNull String alias) {
         Assert.isTrue(prefix != null && subSelectFunc != null && alias != null, "prefix and subSelectFunc and alias are required");
-        sqlBuf.append(prefix).append(subSelectFunc.apply(getSqlChainContext()));
+        sqlBuf.append(prefix).append(" (").append(subSelectFunc.apply(getSqlChainContext()).toSql()).append(") ");
         // 别名
-        sqlBuf.append(" ").append(alias);
+        sqlBuf.append(alias);
         sqlChainContext.putPlaceHolder(String.format(VariablePlaceholder.TABLE_NAME_DOT, alias), alias + ".");
     }
 
