@@ -34,20 +34,15 @@ public class AtomicUtil {
     public static void txExecute(Connection connection, Consumer<Connection> consumer) throws SQLException {
         Assert.isTrue(connection != null, "jdbc connection must not be null");
         synchronized (connection) {
+            connection.setAutoCommit(false);
             try {
-                connection.setAutoCommit(false);
                 consumer.accept(connection);
                 connection.commit();
             } catch (Throwable e) {
-                log.error("transaction commit failed, will rollback", e);
+                log.error("transaction commit failed, will be rollback", e);
                 connection.rollback();
                 throw e;
             }
         }
     }
-
-    public String test() {
-        return null;
-    }
-
 }

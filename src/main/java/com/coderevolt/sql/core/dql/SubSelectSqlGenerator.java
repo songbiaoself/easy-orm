@@ -57,10 +57,6 @@ public class SubSelectSqlGenerator extends DQLSqlGenerator {
         return (SubSelectSqlGenerator) super.leftJoin(subSelectFunc, alias, subOn);
     }
 
-    public SubSelectSqlGenerator leftJoin(SelectFunction<SqlChainContext, SubSelectSqlGenerator> subSelectFunc, String alias) {
-        return (SubSelectSqlGenerator) super.leftJoin(subSelectFunc, alias, null);
-    }
-
     @Override
     public SubSelectSqlGenerator rightJoin(Class<?> tableEntity, String alias, AbstractSub subOn) {
         return (SubSelectSqlGenerator) super.rightJoin(tableEntity, alias, subOn);
@@ -72,10 +68,6 @@ public class SubSelectSqlGenerator extends DQLSqlGenerator {
 
     public SubSelectSqlGenerator rightJoin(SelectFunction<SqlChainContext, SubSelectSqlGenerator> subSelectFunc, String alias, AbstractSub subOn) {
         return (SubSelectSqlGenerator) super.rightJoin(subSelectFunc, alias, subOn);
-    }
-
-    public SubSelectSqlGenerator rightJoin(SelectFunction<SqlChainContext, SubSelectSqlGenerator> subSelectFunc, String alias) {
-        return (SubSelectSqlGenerator) super.rightJoin(subSelectFunc, alias, null);
     }
 
     @Override
