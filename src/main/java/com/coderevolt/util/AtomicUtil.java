@@ -34,6 +34,7 @@ public class AtomicUtil {
     public static void txExecute(Connection connection, Consumer<Connection> consumer) throws SQLException {
         Assert.isTrue(connection != null, "jdbc connection must not be null");
         synchronized (connection) {
+            boolean autoCommit = connection.getAutoCommit();
             connection.setAutoCommit(false);
             try {
                 consumer.accept(connection);
@@ -42,6 +43,8 @@ public class AtomicUtil {
                 log.error("transaction commit failed, will be rollback", e);
                 connection.rollback();
                 throw e;
+            } finally {
+                connection.setAutoCommit(autoCommit);
             }
         }
     }
