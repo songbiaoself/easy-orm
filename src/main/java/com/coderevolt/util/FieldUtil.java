@@ -1,6 +1,10 @@
 package com.coderevolt.util;
 
 import java.beans.Introspector;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class FieldUtil {
 
@@ -32,6 +36,15 @@ public class FieldUtil {
             }
         }
         return res.toString();
+    }
+
+    public static List<Field> getAllFields(Class<?> clz)  {
+        List<Field> fields = new ArrayList<>();
+        while (clz != null && clz != Object.class) {
+            fields.addAll(Arrays.asList(clz.getDeclaredFields()));
+            clz = clz.getSuperclass();
+        }
+        return fields;
     }
 
 }

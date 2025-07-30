@@ -46,7 +46,7 @@ public class DMLSqlGenerator extends AbstractSqlGenerator {
         if (columns != null && columns.length > 0) {
             fieldStream = Arrays.stream(columns).map(SFuncUtil::getField);
         } else {
-            fieldStream = Arrays.stream(tableEntity.getDeclaredFields());
+            fieldStream = FieldUtil.getAllFields(tableEntity).stream();
         }
         sqlBuf.append("(").append(fieldStream.map(field -> {
             Column column = field.getAnnotation(Column.class);
@@ -67,9 +67,9 @@ public class DMLSqlGenerator extends AbstractSqlGenerator {
         }
         List<String> columns = sqlChainContext.getInsertColumns();
         Assert.isNotEmpty(columns, "columns is empty, please call insert into before used");
-        Field[] declaredFields = data.getClass().getDeclaredFields();
-        Assert.isTrue(declaredFields.length > 0, "system error, " + data.getClass() + " declaredFields is empty");
-        Map<String, Field> fieldMap = Arrays.stream(declaredFields).collect(Collectors.toMap(Field::getName, obj -> obj));
+        List<Field> fields = FieldUtil.getAllFields(data.getClass());
+        Assert.isTrue(!fields.isEmpty(), "system error, " + data.getClass() + " declaredFields is empty");
+        Map<String, Field> fieldMap = fields.stream().collect(Collectors.toMap(Field::getName, obj -> obj));
         for (String column : columns) {
             try {
                 Field field = fieldMap.get(column);

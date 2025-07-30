@@ -8,14 +8,13 @@ import com.coderevolt.sql.core.sub.AbstractSub;
 import com.coderevolt.sql.core.sub.SubSet;
 import com.coderevolt.util.Assert;
 import com.coderevolt.util.AtomicUtil;
-import com.coderevolt.util.SubUtil;
+import com.coderevolt.util.FieldUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.List;
 
 public class UpdateSqlGenerator extends DMLSqlGenerator {
@@ -63,40 +62,45 @@ public class UpdateSqlGenerator extends DMLSqlGenerator {
         Column idColumn = null;
         Object idValue = null;
 
-        for (Field field : data.getClass().getDeclaredFields()) {
-            try {
-                field.setAccessible(true);
-                Column column = field.getAnnotation(Column.class);
-                if (column != null) {
-                    if (Column.ColumnType.ID == column.type()) {
-                        Assert.isTrue(idColumn == null, "fount many id");
-                        idField = field;
-                        idColumn = column;
-                        idValue = field.get(data);
-                        Assert.isTrue(idValue != null, "id must not be null");
-                    } else {
-                        if (Column.DmlStrategy.SET_NULL == column.dmlStrategy()) {
-                            sqlBuf.append("@".equals(column.name()) ? field.getName() : column.name()).append(" = ?,");
-                            sqlChainContext.addParamValue(field.get(data));
-                        } else if (Column.DmlStrategy.IGNORE_NULL == column.dmlStrategy() && field.get(data) != null) {
-                            sqlBuf.append("@".equals(column.name()) ? field.getName() : column.name()).append(" = ?,");
-                            sqlChainContext.addParamValue(field.get(data));
+        Class<?> aClass = data.getClass();
+        while (aClass != null && aClass != Object.class) {
+            for (Field field : aClass.getDeclaredFields()) {
+                try {
+                    field.setAccessible(true);
+                    Column column = field.getAnnotation(Column.class);
+                    String fieldName = FieldUtil.underline(field.getName());
+                    if (column != null) {
+                        if (Column.ColumnType.ID == column.type()) {
+                            Assert.isTrue(idColumn == null, "fount many id");
+                            idField = field;
+                            idColumn = column;
+                            idValue = field.get(data);
+                            Assert.isTrue(idValue != null, "id must not be null");
+                        } else {
+                            if (Column.DmlStrategy.SET_NULL == column.dmlStrategy()) {
+                                sqlBuf.append("@".equals(column.name()) ? fieldName : column.name()).append(" = ?,");
+                                sqlChainContext.addParamValue(field.get(data));
+                            } else if (Column.DmlStrategy.IGNORE_NULL == column.dmlStrategy() && field.get(data) != null) {
+                                sqlBuf.append("@".equals(column.name()) ? fieldName : column.name()).append(" = ?,");
+                                sqlChainContext.addParamValue(field.get(data));
+                            }
                         }
+                    } else if (field.get(data) != null) {
+                        // 默认行为，属性为null不更新
+                        sqlBuf.append(fieldName).append(" = ?,");
+                        sqlChainContext.addParamValue(field.get(data));
                     }
-                } else if (field.get(data) != null) {
-                    // 默认行为，属性为null不更新
-                    sqlBuf.append(field.getName()).append(" = ?,");
-                    sqlChainContext.addParamValue(field.get(data));
+                } catch (IllegalAccessException e) {
+                    throw new IllegalArgumentException(e);
                 }
-            } catch (IllegalAccessException e) {
-                throw new IllegalArgumentException(e);
             }
+            aClass = aClass.getSuperclass();
         }
         Assert.isTrue(idField != null, "id not found");
         if (sqlBuf.charAt(sqlBuf.length() - 1) == ',') {
             sqlBuf.deleteCharAt(sqlBuf.length() - 1);
         }
-        sqlBuf.append(" WHERE ").append("@".equals(idColumn.name()) ? idField.getName() : idColumn.name()).append(" = ?");
+        sqlBuf.append(" WHERE ").append("@".equals(idColumn.name()) ? FieldUtil.underline(idField.getName()) : idColumn.name()).append(" = ?");
         sqlChainContext.addParamValue(idValue);
         return copySqlGen;
     }

@@ -7,6 +7,7 @@ import com.coderevolt.model.SubjectModel;
 import com.coderevolt.sql.SqlExecutor;
 import com.coderevolt.sql.core.symbol.SqlSort;
 import com.coderevolt.util.SubUtil;
+import com.coderevolt.vo.StudentVo;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.junit.jupiter.api.Test;
@@ -55,7 +56,7 @@ public class SelectSqlTest {
     @Test
     public void groupTest() throws SQLException {
         List<StudentModel> studentModels = SqlExecutor.builder().selectChain()
-                .sql("select studentModel.age, count(*)")
+                .sql("select age, count(*)")
                 .from(StudentModel.class)
                 .groupBy(StudentModel::getAge)
                 .having(SubUtil.gt(StudentModel::getAge, 18).and().lt(StudentModel::getAge, 30))
@@ -87,26 +88,28 @@ public class SelectSqlTest {
         System.out.println(studentModels);
 
         List<Map<String, Object>> maps = SqlExecutor.builder().selectChain()
-                .select()
-                .from(StudentModel.class)
+                .select(StudentSubjectRelation::getStudentId)
+                .select(StudentModel::getId)
+                .from(StudentModel.class, "t1")
                 .innerJoin(StudentSubjectRelation.class, SubUtil.eq(StudentModel::getId, StudentSubjectRelation::getStudentId))
                 .listMap();
 
         System.out.println(maps);
 
         List<Map<String, Object>> maps1 = SqlExecutor.builder().selectChain()
-                .select()
-                .from(StudentModel.class)
-                .leftJoin(StudentSubjectRelation.class, SubUtil.eq(StudentModel::getId, StudentSubjectRelation::getStudentId))
+                .select(StudentModel::getName, StudentModel::getAge, StudentModel::getId)
+                .select(StudentSubjectRelation::getStudentId, StudentSubjectRelation::getId)
+                .from(StudentModel.class, "t1" )
+                .leftJoin(StudentSubjectRelation.class, "t2", SubUtil.eq(StudentModel::getId, StudentSubjectRelation::getStudentId))
                 .listMap();
 
         System.out.println(maps1);
 
         List<Map<String, Object>> maps2 = SqlExecutor.builder().selectChain()
                 .select()
-                .from(StudentModel.class)
-                .rightJoin(StudentSubjectRelation.class, SubUtil.wrap(SubUtil.eq(StudentModel::getId, StudentSubjectRelation::getStudentId).and().sql("1 = 1")))
-                .rightJoin(SubjectModel.class, SubUtil.eq(StudentSubjectRelation::getSubjectId, SubjectModel::getId))
+                .from(StudentModel.class, "t1")
+                .rightJoin(StudentSubjectRelation.class, "t2", SubUtil.wrap(SubUtil.eq(StudentModel::getId, StudentSubjectRelation::getStudentId).and().sql("1 = 1")))
+                .rightJoin(SubjectModel.class, "t3", SubUtil.eq(StudentSubjectRelation::getSubjectId, SubjectModel::getId))
                 .listMap();
 
         System.out.println(maps2);
@@ -160,6 +163,17 @@ public class SelectSqlTest {
                 .from(StudentModel.class)
                 .where(SubUtil.like(StudentModel::getName, "%李四% or 1 = 1"))
                 .listMap());
+    }
+
+    @Test
+    public void inheritTest() throws SQLException {
+        List<StudentVo> studentModels = SqlExecutor.builder().selectChain()
+                .select()
+                .from(StudentModel.class)
+                .where(SubUtil.like(StudentModel::getName, "%李%"))
+                .list(StudentVo.class);
+
+        System.out.println(studentModels);
     }
 
 

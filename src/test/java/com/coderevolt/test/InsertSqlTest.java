@@ -39,8 +39,10 @@ public class InsertSqlTest {
                 .exec());
 
         System.out.println(SqlExecutor.builder().insertChain()
-                .insertInto(StudentModel.class)
-                .select(SubUtil.subSelect().select().from(StudentModel.class))
+                .insertInto(StudentModel.class, StudentModel::getName, StudentModel::getAge, StudentModel::getHobby, StudentModel::getAvatar, StudentModel::getPhone)
+                .select(SubUtil.subSelect()
+                        .select(StudentModel::getName, StudentModel::getAge, StudentModel::getHobby, StudentModel::getAvatar, StudentModel::getPhone)
+                        .from(StudentModel.class))
                 .exec());
     }
 

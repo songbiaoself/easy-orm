@@ -42,16 +42,11 @@ public abstract class AbstractSqlGenerator {
         Table tableAnnotation = tableEntity.getAnnotation(Table.class);
         Assert.isTrue(tableAnnotation != null && tableAnnotation.value() != null, tableEntity.getName() + "not use @Table annotation defined a table name");
         sqlBuf.append(prefix).append(tableAnnotation.value());
-        String tablePlaceHolder = getTablePlaceHolder(tableEntity);
         if (alias != null) {
             // 别名
             sqlBuf.append(" ").append(alias);
+            String tablePlaceHolder = getTablePlaceHolder(tableEntity);
             sqlChainContext.putPlaceHolder(tablePlaceHolder, alias + ".");
-        } else {
-            // 别名
-            String t = Introspector.decapitalize(tableEntity.getSimpleName());
-            sqlBuf.append(" ").append(t);
-            sqlChainContext.putPlaceHolder(tablePlaceHolder, t + ".");
         }
     }
 
@@ -77,6 +72,6 @@ public abstract class AbstractSqlGenerator {
         for (String placeholder : placeHolderMap.keySet()) {
             sql = sql.replace(placeholder, placeHolderMap.getOrDefault(placeholder, ""));
         }
-        return sql;
+        return sql.replaceAll("\\$TABLE_NAME_.+?\\$.", "");
     }
 }

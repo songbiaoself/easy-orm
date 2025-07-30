@@ -29,17 +29,17 @@ public class UpdateSqlTest {
     public void test() {
         System.out.println(SqlExecutor.builder(SqlOption.builder()
                         .sourceName("mysql")
-                                .sqlExecuteHook(new SqlExecuteHook() {
-                                    @Override
-                                    public void beforeRun(Connection connection, SqlChainContext sqlChainContext) {
-                                        System.out.println("beforeRun");
-                                    }
+                        .sqlExecuteHook(new SqlExecuteHook() {
+                            @Override
+                            public void beforeRun(Connection connection, SqlChainContext sqlChainContext) {
+                                System.out.println("beforeRun");
+                            }
 
-                                    @Override
-                                    public void afterRun(Connection connection, SqlChainContext sqlChainContext, Object result) {
-                                        System.out.println("afterRun");
-                                    }
-                                })
+                            @Override
+                            public void afterRun(Connection connection, SqlChainContext sqlChainContext, Object result) {
+                                System.out.println("afterRun");
+                            }
+                        })
                         .build())
                 .updateChain()
                 .update(StudentModel.class)

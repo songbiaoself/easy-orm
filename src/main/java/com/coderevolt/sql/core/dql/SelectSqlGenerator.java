@@ -148,37 +148,7 @@ public class SelectSqlGenerator extends DQLSqlGenerator {
         List<V> result = new ArrayList<>(resultSet.size());
         for (Map<String, Object> row : resultSet) {
             try {
-                V t = clazz.newInstance();
-                for (Field declaredField : clazz.getDeclaredFields()) {
-                    declaredField.setAccessible(true);
-                    Column column = declaredField.getAnnotation(Column.class);
-                    Object value = null;
-                    if (column != null && !"@".equals(column.name())) {
-                        value = row.get(FieldUtil.camelCase(column.name()));
-                    } else {
-                        value = row.get(declaredField.getName());
-                    }
-                    try {
-                        declaredField.set(t, value);
-                    } catch (RuntimeException e) {
-                        if (value instanceof Number) {
-                            // 值强转
-                            Class<?> type = declaredField.getType();
-                            if (type == float.class || type == Float.class) {
-                                declaredField.set(t, ((Number) value).floatValue());
-                            } else if (type == int.class || type == Integer.class) {
-                                declaredField.set(t, ((Number) value).intValue());
-                            } else if (type == short.class || type == Short.class) {
-                                declaredField.set(t, ((Number) value).shortValue());
-                            } else if (type == byte.class || type == Byte.class) {
-                                declaredField.set(t, ((Number) value).byteValue());
-                            }
-                        } else {
-                            throw e;
-                        }
-                    }
-                }
-                result.add(t);
+                result.add(mapField(clazz, row));
             } catch (InstantiationException | IllegalAccessException e) {
                 throw new IllegalStateException(e);
             }
@@ -186,25 +156,85 @@ public class SelectSqlGenerator extends DQLSqlGenerator {
         return result;
     }
 
+    private static <V> V mapField(Class<V> clazz, Map<String, Object> map) throws InstantiationException, IllegalAccessException {
+        if (clazz.isInstance(map)) {
+            return (V) map;
+        }
+        if (clazz.isAssignableFrom(Number.class)) {
+            // 兼容包装类
+            Object value = map.values().iterator().next();
+            if (clazz.isAssignableFrom(Integer.class)) {
+                return (V) Integer.valueOf(value.toString());
+            } else if (clazz.isAssignableFrom(Long.class)) {
+                return (V) Long.valueOf(value.toString());
+            } else if (clazz.isAssignableFrom(Double.class)) {
+                return (V) Double.valueOf(value.toString());
+            } else if (clazz.isAssignableFrom(Float.class)) {
+                return (V) Float.valueOf(value.toString());
+            } else if (clazz.isAssignableFrom(Short.class)) {
+                return (V) Short.valueOf(value.toString());
+            } else if (clazz.isAssignableFrom(Byte.class)) {
+                return (V) Byte.valueOf(value.toString());
+            } else {
+                throw new IllegalStateException("convert error, unsupported number type :" + clazz);
+            }
+        }
+        if (clazz.isAssignableFrom(String.class)) {
+            return (V) map.values().iterator().next().toString();
+        }
+        if (clazz.isAssignableFrom(Boolean.class)) {
+            return (V) Boolean.valueOf(map.values().iterator().next().toString());
+        }
+
+        V t = clazz.newInstance();
+        Class<?> currentClass = clazz;
+        while (currentClass != null && !Object.class.equals(currentClass)) {
+            for (Field declaredField : currentClass.getDeclaredFields()) {
+                Object value = null;
+                Column column = declaredField.getAnnotation(Column.class);
+                if (column != null && !"@".equals(column.name())) {
+                    value = map.get(FieldUtil.camelCase(column.name()));
+                } else {
+                    value = map.get(declaredField.getName());
+                }
+                declaredField.setAccessible(true);
+                try {
+                    declaredField.set(t, value);
+                } catch (RuntimeException e) {
+                    if (value instanceof Number) {
+                        // 值强转
+                        Class<?> type = declaredField.getType();
+                        if (type == float.class || type == Float.class) {
+                            declaredField.set(t, ((Number) value).floatValue());
+                        } else if (type == int.class || type == Integer.class) {
+                            declaredField.set(t, ((Number) value).intValue());
+                        } else if (type == short.class || type == Short.class) {
+                            declaredField.set(t, ((Number) value).shortValue());
+                        } else if (type == byte.class || type == Byte.class) {
+                            declaredField.set(t, ((Number) value).byteValue());
+                        } else if (type == long.class || type == Long.class) {
+                            declaredField.set(t, ((Number) value).longValue());
+                        } else if (type == double.class || type == Double.class) {
+                            declaredField.set(t, ((Number) value).doubleValue());
+                        } else {
+                            throw new IllegalStateException("convert error, unsupported number type :" + clazz);
+                        }
+                    } else {
+                        throw e;
+                    }
+                }
+            }
+            currentClass = currentClass.getSuperclass();
+        }
+        return t;
+    }
+
     public <V> V one(Class<V> clazz) throws SQLException {
         List<Map<String, Object>> resultSet = execute();
         Assert.isTrue(resultSet.size() <= 1, "found many rows: " + resultSet.size());
         if (resultSet.size() == 1) {
-            Map<String, Object> map = resultSet.get(0);
             try {
-                V t = clazz.newInstance();
-                for (Field declaredField : clazz.getDeclaredFields()) {
-                    Object value = null;
-                    Column column = declaredField.getAnnotation(Column.class);
-                    if (column != null && !"@".equals(column.name())) {
-                        value = map.get(FieldUtil.camelCase(column.name()));
-                    } else {
-                        value = map.get(declaredField.getName());
-                    }
-                    declaredField.setAccessible(true);
-                    declaredField.set(t, value);
-                }
-                return t;
+                return mapField(clazz, resultSet.get(0));
             } catch (InstantiationException | IllegalAccessException e) {
                 throw new IllegalStateException(e);
             }

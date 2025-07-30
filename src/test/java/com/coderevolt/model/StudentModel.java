@@ -9,7 +9,7 @@ public class StudentModel {
     @Column(type = Column.ColumnType.ID)
     private Long id;
 
-    @Column(name = "t_name")
+//    @Column(name = "t_name")
     private String name;
 
     @Column(dmlStrategy = Column.DmlStrategy.IGNORE_NULL)
@@ -20,6 +20,16 @@ public class StudentModel {
 
     @Column(dmlStrategy = Column.DmlStrategy.SET_NULL)
     private String avatar;
+
+    private String phone;
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
 
     public StudentModel() {
     }
@@ -77,9 +87,12 @@ public class StudentModel {
     @Override
     public String toString() {
         return "StudentModel{" +
-                "id='" + id + '\'' +
+                "id=" + id +
                 ", name='" + name + '\'' +
-                ", age='" + age + '\'' +
+                ", age=" + age +
+                ", hobby='" + hobby + '\'' +
+                ", avatar='" + avatar + '\'' +
+                ", phone='" + phone + '\'' +
                 '}';
     }
 }
