@@ -212,7 +212,7 @@ public abstract class DQLSqlGenerator extends AbstractSqlGenerator {
             }
 
             if (sqlOption.getSqlExecuteHook() != null) {
-                sqlOption.getSqlExecuteHook().beforeRun(connection, sqlChainContext);
+                sqlOption.getSqlExecuteHook().beforeRun(preparedStatement, sqlChainContext);
             }
 
             log.debug("==> execute sql: {}", sql);
@@ -246,7 +246,7 @@ public abstract class DQLSqlGenerator extends AbstractSqlGenerator {
             }
 
             if (sqlOption.getSqlExecuteHook() != null) {
-                sqlOption.getSqlExecuteHook().afterRun(connection, sqlChainContext, result);
+                sqlOption.getSqlExecuteHook().afterRun(preparedStatement, sqlChainContext, result);
             }
 
             return result;

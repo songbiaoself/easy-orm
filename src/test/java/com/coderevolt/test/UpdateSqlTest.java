@@ -11,7 +11,7 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.junit.jupiter.api.Test;
 
-import java.sql.Connection;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,17 +29,17 @@ public class UpdateSqlTest {
     public void test() {
         System.out.println(SqlExecutor.builder(SqlOption.builder()
                         .sourceName("mysql")
-                        .sqlExecuteHook(new SqlExecuteHook() {
-                            @Override
-                            public void beforeRun(Connection connection, SqlChainContext sqlChainContext) {
-                                System.out.println("beforeRun");
-                            }
+                                .sqlExecuteHook(new SqlExecuteHook() {
+                                    @Override
+                                    public void beforeRun(Statement statement, SqlChainContext sqlChainContext) {
+                                        System.out.println("beforeRun");
+                                    }
 
-                            @Override
-                            public void afterRun(Connection connection, SqlChainContext sqlChainContext, Object result) {
-                                System.out.println("afterRun");
-                            }
-                        })
+                                    @Override
+                                    public void afterRun(Statement statement, SqlChainContext sqlChainContext, Object result) {
+                                        System.out.println("afterRun");
+                                    }
+                                })
                         .build())
                 .updateChain()
                 .update(StudentModel.class)

@@ -131,7 +131,7 @@ public class DMLSqlGenerator extends AbstractSqlGenerator {
             }
 
             if (sqlOption.getSqlExecuteHook() != null) {
-                sqlOption.getSqlExecuteHook().beforeRun(connection, getSqlChainContext());
+                sqlOption.getSqlExecuteHook().beforeRun(preparedStatement, getSqlChainContext());
             }
             log.debug("==> execute sql: {}", sql);
             if (log.isDebugEnabled() && !paramValueList.isEmpty()) {
@@ -146,7 +146,7 @@ public class DMLSqlGenerator extends AbstractSqlGenerator {
             result = true;
 
             if (sqlOption.getSqlExecuteHook() != null) {
-                sqlOption.getSqlExecuteHook().afterRun(connection, getSqlChainContext(), count);
+                sqlOption.getSqlExecuteHook().afterRun(preparedStatement, getSqlChainContext(), count);
             }
         } catch (Exception e) {
             log.error("execute error", e);

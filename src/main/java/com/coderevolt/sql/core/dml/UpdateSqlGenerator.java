@@ -49,6 +49,10 @@ public class UpdateSqlGenerator extends DMLSqlGenerator {
         return genUpdateSqlExecutor(data).exec();
     }
 
+    public boolean updateById(Object data, Connection connection) {
+        return genUpdateSqlExecutor(data).exec(connection);
+    }
+
     private UpdateSqlGenerator genUpdateSqlExecutor(Object data) {
         // 浅拷贝
         SqlOption sqlOptionClone = getSqlChainContext().getSqlOption().clone();
@@ -106,13 +110,21 @@ public class UpdateSqlGenerator extends DMLSqlGenerator {
     }
 
     public boolean updateByIdBatch(List<?> dataList) {
-        if (dataList == null || dataList.isEmpty()) {
-            return false;
-        }
         String sourceName = getSqlChainContext().getSqlOption().getSourceName();
         Connection connection = null;
         try {
             connection = SqlConnectFactory.getConnection(sourceName);
+        } catch (SQLException e) {
+            throw new IllegalStateException(e);
+        }
+        return updateByIdBatch(dataList, connection);
+    }
+
+    public boolean updateByIdBatch(List<?> dataList, Connection connection) {
+        if (dataList == null || dataList.isEmpty() || connection == null) {
+            return false;
+        }
+        try {
             AtomicUtil.txExecute(connection, con -> {
                 for (Object data : dataList) {
                     genUpdateSqlExecutor(data).exec(con);
@@ -121,12 +133,10 @@ public class UpdateSqlGenerator extends DMLSqlGenerator {
         } catch (SQLException e) {
             throw new IllegalStateException(e);
         } finally {
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException e) {
-                    log.error("connection close failed", e);
-                }
+            try {
+                connection.close();
+            } catch (SQLException e) {
+                log.error("connection close failed", e);
             }
         }
         return true;
