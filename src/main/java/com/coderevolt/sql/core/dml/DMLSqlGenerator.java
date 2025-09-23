@@ -121,7 +121,7 @@ public class DMLSqlGenerator extends AbstractSqlGenerator {
                 connection.setTransactionIsolation(sqlOption.getTransactionIsolation().getValue());
             }
             String sql = toSql();
-            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
 
             // 占位符赋值
             List<Object> paramValueList = getSqlChainContext().getParamValueList();
