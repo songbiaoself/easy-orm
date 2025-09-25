@@ -150,6 +150,7 @@ public class DMLSqlGenerator extends AbstractSqlGenerator {
             }
         } catch (Exception e) {
             log.error("execute error", e);
+            throw new RuntimeException(e);
         } finally {
             try {
                 // 关闭资源
