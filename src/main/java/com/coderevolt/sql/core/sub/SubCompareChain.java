@@ -76,7 +76,7 @@ public class SubCompareChain extends AbstractSubChain {
     }
 
     public <T, R>SubCompareChain gq(SFunction<T, ?> column, SelectFunction<SqlChainContext, SubSelectSqlGenerator> subSelect) {
-        return compare(column, SqlOp.M.RT, subSelect);
+        return compare(column, SqlOp.M.RQ, subSelect);
     }
 
     public <T, R>SubCompareChain in(SFunction<T, ?> column, SelectFunction<SqlChainContext, SubSelectSqlGenerator> subSelect) {
@@ -108,7 +108,7 @@ public class SubCompareChain extends AbstractSubChain {
     }
 
     public <T, R>SubCompareChain gq(SFunction<T, ?> column, SFunction<R, ?> parentColumn) {
-        return compare(column, SqlOp.M.RT, parentColumn);
+        return compare(column, SqlOp.M.RQ, parentColumn);
     }
 
     public <T, R>SubCompareChain eq(SFunction<T, ?> column, Serializable data) {
@@ -132,7 +132,7 @@ public class SubCompareChain extends AbstractSubChain {
     }
 
     public <T, R>SubCompareChain gq(SFunction<T, ?> column, Serializable data) {
-        return compare(column, SqlOp.M.RT, data);
+        return compare(column, SqlOp.M.RQ, data);
     }
 
     public <T, R>SubCompareChain in(SFunction<T, ?> column, List<Serializable> data) {
