@@ -163,4 +163,8 @@ public class SubUtil {
         return new SubCompareChain().sql(sql);
     }
 
+    public static SubCompareChain cond(boolean cond, SubCompareChain sub) {
+        return new SubCompareChain().cond(cond, sub);
+    }
+
 }

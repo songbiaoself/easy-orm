@@ -1,0 +1,1 @@
+mvn install:install-file -Dfile=./build/libs/easy-orm.jar -DgroupId=com.coderevolt -DartifactId=easy-orm -Dversion=1.0.1 -Dpackaging=jar

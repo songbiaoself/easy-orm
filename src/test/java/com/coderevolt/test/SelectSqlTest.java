@@ -176,6 +176,21 @@ public class SelectSqlTest {
         System.out.println(studentModels);
     }
 
+    @Test
+    public void condWrapTest() throws SQLException {
+        List<Map<String, Object>> listedMap = SqlExecutor.builder().selectChain()
+                .select()
+                .from(StudentModel.class)
+                .where(SubUtil.cond(false, SubUtil.lt(StudentModel::getAge, 50))
+                        .and()
+                        .cond(true, SubUtil.lt(StudentModel::getAge, 50))
+                        .or()
+                        .gt(StudentModel::getAge, 10))
+                .listMap();
+
+        System.out.println(listedMap);
+    }
+
 
 
 }

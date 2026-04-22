@@ -12,17 +12,17 @@ import com.coderevolt.util.SFunction;
 import com.coderevolt.util.SelectFunction;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class SubCompareChain extends AbstractSubChain {
 
-    private final List<AbstractSub> compareList;
+    private final LinkedList<AbstractSub> compareList;
 
     public SubCompareChain() {
-        this.compareList = new ArrayList<>();
+        this.compareList = new LinkedList<>();
     }
 
     public <T, R>SubCompareChain between(SFunction<T, ?> column, Serializable start, Serializable end) {
@@ -207,18 +207,25 @@ public class SubCompareChain extends AbstractSubChain {
 
     @Override
     public SubCompareChain or() {
-        if (!compareList.isEmpty()) {
-            compareList.get(compareList.size() - 1).setLink(SqlLink.OR);
-        }
+        link(SqlLink.OR);
         return this;
     }
 
     @Override
     public SubCompareChain and() {
-        if (!compareList.isEmpty()) {
-            compareList.get(compareList.size() - 1).setLink(SqlLink.AND);
-        }
+        link(SqlLink.AND);
         return this;
+    }
+
+    public SubCompareChain cond(boolean cond, AbstractSub sub) {
+        compareList.add(new SubConditionWrap(cond, sub));
+        return this;
+    }
+
+    private void link(SqlLink and) {
+        if (!compareList.isEmpty()) {
+            compareList.getLast().setLink(and);
+        }
     }
 
     @Override

@@ -3,7 +3,7 @@ plugins {
 }
 
 group = 'com.coderevolt'
-version = '1.0-SNAPSHOT'
+version = '1.0.1'
 
 repositories {
     maven { url 'https://maven.aliyun.com/repository/public/' }
@@ -39,4 +39,9 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+// build.gradle
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
 }
