@@ -173,8 +173,10 @@ public abstract class DQLSqlGenerator extends AbstractSqlGenerator {
 
     protected DQLSqlGenerator limit(@Nullable Integer start, Integer count) {
         sqlBuf.append(" LIMIT ");
-        if (start != null) sqlBuf.append(start).append(", ");
         sqlBuf.append(count);
+        if (start != null) {
+            sqlBuf.append(" OFFSET ").append(start);
+        }
         return this;
     }
 

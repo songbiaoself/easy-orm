@@ -1,1 +1,1 @@
-mvn install:install-file -Dfile=./build/libs/easy-orm.jar -DgroupId=com.coderevolt -DartifactId=easy-orm -Dversion=1.0.2 -Dpackaging=jar
+mvn install:install-file -Dfile=./build/libs/easy-orm.jar -DgroupId=com.coderevolt -DartifactId=easy-orm-pgsql -Dversion=1.0.2 -Dpackaging=jar
