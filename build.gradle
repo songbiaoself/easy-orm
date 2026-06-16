@@ -3,7 +3,7 @@ plugins {
 }
 
 group = 'com.coderevolt'
-version = '1.0.1'
+version = '1.0.2'
 
 repositories {
     maven { url 'https://maven.aliyun.com/repository/public/' }
@@ -22,9 +22,13 @@ jar {
     }
 }
 
+//sourceCompatibility = '1.8'
+//targetCompatibility = '1.8'
 // 设置兼容性版本
-sourceCompatibility = '1.8'
-targetCompatibility = '1.8'
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
 
 dependencies {
     testImplementation platform('org.junit:junit-bom:5.10.0')
@@ -34,7 +38,7 @@ dependencies {
 //    runtimeOnly 'org.postgresql:postgresql:42.7.3'
 //    implementation 'ch.qos.logback:logback-classic:1.2.11'
 //    implementation 'ch.qos.logback:logback-core:1.2.11'
-//    compileOnly 'org.slf4j:slf4j-api:2.0.12'
+    compileOnly 'org.slf4j:slf4j-api:2.0.12'
 }
 
 test {
