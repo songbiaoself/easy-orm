@@ -48,7 +48,10 @@ public class DMLSqlGenerator extends AbstractSqlGenerator {
         } else {
             fieldStream = FieldUtil.getAllFields(tableEntity).stream();
         }
-        sqlBuf.append("(").append(fieldStream.map(field -> {
+        sqlBuf.append("(").append(fieldStream.filter(f -> {
+            Column column = f.getAnnotation(Column.class);
+            return !(column != null && Column.DmlStrategy.IGNORE_COLUMN == column.dmlStrategy());
+        }).map(field -> {
             Column column = field.getAnnotation(Column.class);
             sqlChainContext.addInsertColumn(field.getName());
             if (column == null) {

@@ -80,7 +80,7 @@ public class UpdateSqlGenerator extends DMLSqlGenerator {
                             idColumn = column;
                             idValue = field.get(data);
                             Assert.isTrue(idValue != null, "id must not be null");
-                        } else {
+                        } else if (Column.DmlStrategy.IGNORE_COLUMN != column.dmlStrategy()){
                             if (Column.DmlStrategy.SET_NULL == column.dmlStrategy()) {
                                 sqlBuf.append("@".equals(column.name()) ? fieldName : column.name()).append(" = ?,");
                                 sqlChainContext.addParamValue(field.get(data));

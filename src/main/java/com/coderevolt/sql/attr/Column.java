@@ -41,7 +41,11 @@ public @interface Column {
         /**
          * 忽略null值
          */
-        IGNORE_NULL
+        IGNORE_NULL,
+        /**
+         * 忽略列，新增和编辑忽略该列
+         */
+        IGNORE_COLUMN
     }
 
 }
